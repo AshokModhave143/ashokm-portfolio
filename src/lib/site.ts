@@ -18,6 +18,7 @@ export const site = {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/work", label: "Work" },
+    { href: "/ask", label: "Ask" },
     { href: "/blog", label: "Writing" },
     { href: "/now", label: "Now" },
     { href: "/stack", label: "Stack" },

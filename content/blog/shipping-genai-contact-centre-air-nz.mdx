@@ -1,0 +1,41 @@
+---
+title: "Shipping a GenAI contact-centre assistant — what actually mattered"
+description: "Lessons from building a production Azure OpenAI assistant for contact-centre agents: streaming UX, designing for other teams, and why compliance shaped every decision."
+date: "2026-05-29"
+tags: ["GenAI", "Azure OpenAI", "war story"]
+draft: false
+---
+
+In 2024 I led the build of a GenAI assistant for contact-centre agents at Air New Zealand — a tool that answers agents' questions in real time from internal legal and operational documents. It lifted agent answer-efficiency by 73%. Here's what actually mattered, beyond the model.
+
+## Streaming wasn't a nice-to-have
+
+The first prototype waited for the full response, then rendered it. It tested fine and felt terrible. Agents are mid-call; a four-second blank pause is dead air with a customer on the line.
+
+Switching to streaming changed the product. I piped tokens through RxJS observables into the UI so answers appeared as they were generated. Same model, same latency — but the *perceived* speed, and the agent's trust in the tool, went up sharply. The lesson stuck: for assistive AI, time-to-first-token beats time-to-final-answer.
+
+## Build the platform, not the feature
+
+The brief was one assistant for one team. But every other business unit had the same shape of problem — a pile of documents and people who needed answers from them.
+
+So I designed it domain-agnostic: the core knew nothing about any specific dataset. A team could plug in their own documents and prompts without touching the engine. That decision is why multiple internal teams later onboarded their own datasets onto the same platform instead of commissioning their own builds. The extra design effort up front was small; the leverage was not.
+
+## The boring parts were the hard parts
+
+The model was rarely the problem. The hard parts were:
+
+- **Retrieval quality.** Garbage context produces confident garbage. Most of the iteration went into what we fed the model, not the model itself.
+- **Prompt refinement and suggestion generation.** Giving agents a starting point — suggested follow-ups, refined queries — mattered more than raw answer quality.
+- **Knowing when to say "I don't know."** In a contact centre, a wrong-but-fluent answer is worse than no answer. Tuning the assistant to decline gracefully was a feature, not a failure mode.
+
+## Compliance shaped everything
+
+This ran inside an enterprise with real regulatory constraints. Auth went through Azure B2C. Data residency, what could be logged, what the model could and couldn't see — these weren't afterthoughts, they were design inputs from day one.
+
+Working in regulated environments teaches a useful default: assume every shortcut you'd take in a side project is the thing that fails an audit. Least privilege, scope minimisation, and auditability aren't overhead — they're what lets you ship AI somewhere it actually matters.
+
+## What I'd carry forward
+
+If I built this again today, I'd reach for the modern toolkit — the Vercel AI SDK for streaming and tool-calling UX, a proper evals harness so quality is measured rather than vibed, and the agentic patterns that turn a single assistant into a system. That's exactly the direction I'm taking my own learning now.
+
+But the core lessons would be the same: stream early, design for the next team, sweat the retrieval, and treat compliance as a design input. The model is the easy part.
